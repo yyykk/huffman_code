@@ -3,18 +3,48 @@
 
 #include "huffman_tree.h"
 
-Huffman_Tree::Huffman_Tree(string file_name, int n){
+Huffman_Tree::Huffman_Tree(string file_name){
 	left = nullptr;
 	right = nullptr;
 	parent = 0;
-	if (read_file(file_name, n)){
-		//cout << "create object success" << endl;
+	if (get_probability(file_name)){
+		*this = *build();   
 	}else{
 		cout << "create object error" << endl;
 	}
 }
 
-bool Huffman_Tree::read_file(string file_name, int MAX){
+int Huffman_Tree::get_probability(string file_name){
+	float word_amount = 0;
+	float probability = 0;
+	string text;
+	ifstream infile;
+	ofstream outfile;
+	map<char, float> word_count;
+	infile.open(file_name, ios::in);
+	if (!infile){
+		cout << "can not open word text" << endl;
+		return 0;
+	}
+	else{
+		getline(infile, text);
+	}
+	for (auto &s : text){
+		++word_count[s];
+		++word_amount;
+	}
+	outfile.open("probability.txt", ios::out);
+	for (auto &w : word_count){
+		ostringstream stream;
+		probability = w.second / word_amount;
+		stream << w.first;
+		outfile << stream.str() << "\t" << probability << endl;
+		//cout << stream.str() << "\t" << probability << endl;
+		word.insert(make_pair(probability, stream.str()));
+	}
+}
+
+/*bool Huffman_Tree::read_file(string file_name, int MAX){
 	word.clear();
 	double probability = 0;
 	double weight = 0;
@@ -41,7 +71,7 @@ bool Huffman_Tree::read_file(string file_name, int MAX){
 			return 0;
 		}
 	}
-}
+}*/
 
 Huffman_Tree* Huffman_Tree::build(){
 	int n = word.size();
