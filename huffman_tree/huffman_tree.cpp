@@ -8,7 +8,9 @@ Huffman_Tree::Huffman_Tree(string file_name){
 	right = nullptr;
 	parent = 0;
 	if (get_probability(file_name)){
-		*this = *build();   
+		string temp = this->get_text;
+		*this = *build(); 
+		this->get_text = temp;
 	}else{
 		cout << "create object error" << endl;
 	}
@@ -17,7 +19,6 @@ Huffman_Tree::Huffman_Tree(string file_name){
 int Huffman_Tree::get_probability(string file_name){
 	float word_amount = 0;
 	float probability = 0;
-	string text;
 	ifstream infile;
 	ofstream outfile;
 	map<char, float> word_count;
@@ -27,9 +28,9 @@ int Huffman_Tree::get_probability(string file_name){
 		return 0;
 	}
 	else{
-		getline(infile, text);
+		getline(infile, get_text);
 	}
-	for (auto &s : text){
+	for (auto &s : get_text){
 		++word_count[s];
 		++word_amount;
 	}
@@ -42,6 +43,7 @@ int Huffman_Tree::get_probability(string file_name){
 		//cout << stream.str() << "\t" << probability << endl;
 		word.insert(make_pair(probability, stream.str()));
 	}
+	return 1;
 }
 
 /*bool Huffman_Tree::read_file(string file_name, int MAX){
@@ -165,6 +167,9 @@ void Huffman_Tree::make_code(Huffman_Tree *root, Huffman_Tree *t, string s_codei
 
 string Huffman_Tree::to_Huffman_code(string str){
 	string sentence = "";
+	if (str == ""){
+		str = get_text;
+	}
 	if (already_code.size() == 0){
 		cout << "this object no configure" << endl;
 	}else{
@@ -179,7 +184,7 @@ string Huffman_Tree::to_Huffman_code(string str){
 
 string Huffman_Tree::to_Word(string str){
 	string new_word;
-	cout << str << endl;
+	//cout << str << endl;
 	if (word.empty()){
 		cout << "this object no configure" << endl;
 	}
@@ -197,7 +202,7 @@ string Huffman_Tree::to_Word(string str){
 			}
 		}
 	}
-	cout << new_word << endl;
+	//cout << new_word << endl;
 	return new_word;
 }
 
@@ -217,11 +222,15 @@ void Huffman_Tree::show_Huffman_code(){
 	}
 }
 
-void Huffman_Tree::show(Huffman_Tree *t){
+void Huffman_Tree::show(){
+	show_t(this);
+}
+
+void Huffman_Tree::show_t(Huffman_Tree *t){
 	if (t != nullptr){
 		cout << t->code.first << "\t" << t->code.second << endl;
-		show(t->left);
-		show(t->right);
+		show_t(t->left);
+		show_t(t->right);
 	}
 }
 

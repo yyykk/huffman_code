@@ -24,7 +24,7 @@ public:
 	string to_Huffman_code(string str = "");//传入str字符，返回编好的码
 	string to_Word(string str = "");//传入哈夫曼码，传出译码字符
 	int get_probability(string file_name);//输出概率文件
-	void show(Huffman_Tree *t);//先序遍历,传入调用该函数对象的地址
+	void show();//先序遍历,传入调用该函数对象的地址
 	void show_Huffman_code();//显示哈夫曼码
 
 private:
@@ -32,6 +32,7 @@ private:
 	void make_code(Huffman_Tree *root, Huffman_Tree *t, string s_codeing);
 	bool Huffman_code();
 	bool read_file(string file_name, int MAX);
+	void show_t(Huffman_Tree *p);
 
 private:
 	Huffman_Tree    *left;
@@ -39,6 +40,7 @@ private:
 	pair<double, string> code;
 	multimap<double, string> word;
 	map<string, string> already_code;
+	string get_text;
 	int parent;  
 };
 
