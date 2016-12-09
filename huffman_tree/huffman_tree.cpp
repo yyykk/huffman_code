@@ -24,7 +24,7 @@ int Huffman_Tree::get_probability(string file_name){
 	map<char, float> word_count;
 	infile.open(file_name, ios::in);
 	if (!infile){
-		cout << "can not open word text" << endl;
+		//cout << "can not open word text" << endl;
 		return 0;
 	}
 	else{
