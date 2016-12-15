@@ -6,7 +6,7 @@
 Huffman_Tree::Huffman_Tree(string file_name){
 	left = nullptr;
 	right = nullptr;
-	parent = 0;
+	parent = false;
 	if (get_probability(file_name)){
 		string temp = this->get_text;
 		*this = *build(); 
@@ -17,14 +17,14 @@ Huffman_Tree::Huffman_Tree(string file_name){
 }
 
 int Huffman_Tree::get_probability(string file_name){
-	float word_amount = 0;
-	float probability = 0;
+	double word_amount = 0;
+	double probability = 0;
 	ifstream infile;
 	ofstream outfile;
-	map<char, float> word_count;
+	map<char, double> word_count;
 	infile.open(file_name, ios::in);
 	if (!infile){
-		//cout << "can not open word text" << endl;
+		cout << "can not open word text" << endl;
 		return 0;
 	}
 	else{
@@ -43,6 +43,7 @@ int Huffman_Tree::get_probability(string file_name){
 		//cout << stream.str() << "\t" << probability << endl;
 		word.insert(make_pair(probability, stream.str()));
 	}
+	outfile.close();
 	return 1;
 }
 
@@ -76,12 +77,54 @@ int Huffman_Tree::get_probability(string file_name){
 }*/
 
 Huffman_Tree* Huffman_Tree::build(){
+	ofstream outfile;
+	outfile.open("debug.txt", ios::out);
 	int n = word.size();
-	if (n<2){
+	if (n < 2){
 		cout << "Your code is < 2" << endl;
 		return nullptr;
 	}
-	int m = 2 * n - 1;
+	multimap<double, Huffman_Tree*> select;
+	for (auto &w : word){
+		Huffman_Tree* root = new Huffman_Tree;
+		root->code = w;
+		select.insert({ w.first, root });
+	}
+	while (1){
+		Huffman_Tree *root = new Huffman_Tree;
+		//		for (auto &s : select){
+		//			cout << s.first << " " << s.second->parent << "\t";
+		//		}
+		//cout << endl;
+		//cout << select.size() << endl;
+
+		for (auto &m : select){
+			if (m.second->parent == true){
+				continue;
+			}
+			if (root->left == nullptr){
+				root->left = m.second;
+				m.second->parent = true;
+			}
+			else if (root->right == nullptr){
+				root->right = m.second;
+				m.second->parent = true;
+				root->code.first = (root->left->code).first + (root->right->code).first;
+				select.insert({ (root->code).first, root });
+				//cout << "insert: " << (root->code).first << endl;
+				break;
+			}
+		}
+		if (select.size() == 2 * n - 1){
+			break;
+		}
+	}
+	auto s = (--select.end())->second;
+	s->word = this->word;
+	s->Huffman_code();
+	return s;
+}
+/*	int m = 2 * n - 1;
 	Huffman_Tree* root = new Huffman_Tree[m];
 	auto r = root;
 	auto w1 = word.begin();
@@ -90,6 +133,10 @@ Huffman_Tree* Huffman_Tree::build(){
 		++r; ++w1;
 	}
 	for (int i = n; i < m; ++i){
+		for (int k = 0; k < m; ++k){
+			outfile << root[k].code.first << "\t";
+		}
+		outfile << endl;
 		int num1, num2;
 		choose(root, i, num1, num2);
 		root[i].left = &root[num1];
@@ -99,6 +146,7 @@ Huffman_Tree* Huffman_Tree::build(){
 		root[i].code.first = root[num1].code.first + root[num2].code.first;
 		root[i].code.second = "NULL";
 	}
+	outfile.close();
 	root[m - 1].word = this->word;
 	root[m - 1].Huffman_code();
 	return &root[m - 1];
@@ -137,7 +185,7 @@ void Huffman_Tree::choose(Huffman_Tree* t, int n, int &num_1, int &num_2){
 			}
 		}
 	}
-}
+}*/
 
 bool Huffman_Tree::Huffman_code(){
 	if (this->word.size() == 0){
@@ -155,8 +203,7 @@ void Huffman_Tree::make_code(Huffman_Tree *root, Huffman_Tree *t, string s_codei
 		s_codeing = s_codeing + "0";
 		if (t->left == nullptr && t->right == nullptr){
 			root->already_code.insert(make_pair(t->code.second, temp));
-		}
-		else{
+		}else{
 			make_code(root, t->left, s_codeing);
 			s_codeing = temp;
 			s_codeing += "1";
